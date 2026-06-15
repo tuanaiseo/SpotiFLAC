@@ -2,6 +2,7 @@ package backend
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/pquerna/otp"
@@ -9,11 +10,14 @@ import (
 )
 
 const (
-	spotifyTOTPSecret  = "GM3TMMJTGYZTQNZVGM4DINJZHA4TGOBYGMZTCMRTGEYDSMJRHE4TEOBUG4YTCMRUGQ4DQOJUGQYTAMRRGA2TCMJSHE3TCMBY"
 	spotifyTOTPVersion = 61
 )
 
 func generateSpotifyTOTP(now time.Time) (string, int, error) {
+	spotifyTOTPSecret := os.Getenv("SPOTIFY_TOTP_SECRET")
+	if spotifyTOTPSecret == "" {
+		return "", 0, fmt.Errorf("SPOTIFY_TOTP_SECRET environment variable not set")
+	}
 	key, err := otp.NewKeyFromURL(fmt.Sprintf("otpauth://totp/secret?secret=%s", spotifyTOTPSecret))
 	if err != nil {
 		return "", 0, err
